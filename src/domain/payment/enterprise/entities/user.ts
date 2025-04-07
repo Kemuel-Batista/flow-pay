@@ -10,9 +10,9 @@ export interface UserProps {
   email: string
   phoneNumber: string
   createdAt: Date
-  createdBy?: string
+  createdBy?: UniqueEntityID
   updatedAt?: Date | null
-  updatedBy?: string
+  updatedBy?: UniqueEntityID
 }
 
 export class User extends Entity<UserProps> {
@@ -78,7 +78,7 @@ export class User extends Entity<UserProps> {
     return this.props.createdBy
   }
 
-  set createdBy(createdBy: string | undefined) {
+  set createdBy(createdBy: UniqueEntityID | undefined) {
     this.props.createdBy = createdBy
     this.touch()
   }
@@ -91,7 +91,7 @@ export class User extends Entity<UserProps> {
     return this.props.updatedBy
   }
 
-  set updatedBy(updatedBy: string | undefined) {
+  set updatedBy(updatedBy: UniqueEntityID | undefined) {
     this.props.updatedBy = updatedBy
     this.touch()
   }
