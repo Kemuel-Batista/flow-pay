@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "Test for Grupo Adriano Corbuccio",
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@rocketseat/eslint-config": "^2.2.2",
+    "@swc/core": "^1.11.18",
     "@types/node": "^22.14.0",
-    "eslint": "^9.24.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-vitest-globals": "^1.5.0",
     "typescript": "^5.8.3",
+    "unplugin-swc": "^1.5.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.1"
   }
