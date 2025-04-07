@@ -52,7 +52,9 @@ export class CreateTransferTransactionUseCase {
       return failure(new ResourceNotFoundError())
     }
 
-    const balance = await this.accountsRepository.getBalance(userId)
+    const balance = await this.accountsRepository.getBalance(
+      account.id.toString(),
+    )
 
     if (balance < value) {
       return failure(new NotEnoughBalanceError())
@@ -74,7 +76,7 @@ export class CreateTransferTransactionUseCase {
       description,
     })
 
-    Promise.all([
+    await Promise.all([
       this.transactionsRepository.create(exitTransaction),
       this.transactionsRepository.create(entryTransaction),
     ])
