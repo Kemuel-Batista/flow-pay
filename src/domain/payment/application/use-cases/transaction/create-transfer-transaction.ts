@@ -6,6 +6,9 @@ import { NotEnoughBalanceError } from './errors/not-enough-balance-error'
 import { Transaction } from '@/domain/payment/enterprise/entities/transaction'
 import { TransactionType } from '@/domain/payment/enterprise/enums/transaction-type'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { Log } from '@/domain/payment/enterprise/entities/log'
+import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
+import { LogsRepository } from '../../repositories/logs-repository'
 
 interface CreateTransferTransactionUseCaseRequest {
   bankNumber: string
@@ -25,6 +28,7 @@ export class CreateTransferTransactionUseCase {
   constructor(
     private accountsRepository: AccountsRepository,
     private transactionsRepository: TransactionsRepository,
+    private logsRepository: LogsRepository,
   ) {}
 
   async execute({
@@ -80,6 +84,17 @@ export class CreateTransferTransactionUseCase {
       this.transactionsRepository.create(exitTransaction),
       this.transactionsRepository.create(entryTransaction),
     ])
+
+    const log = Log.create({
+      process: 'transaction.transfer',
+      level: LogLevel.TRACE,
+      userId: new UniqueEntityID(userId),
+      value: `entry-transaction.value: ${entryTransaction.value} | entry-account: ${transferAccount.id}`,
+      oldValue: `exit-transaction.value: ${exitTransaction.value} | exit-account: ${account.id}`,
+      note: `account.bankNumber: ${bankNumber} | account.agencyNumber: ${agencyNumber} | account.accountNumber: ${accountNumber}`,
+    })
+
+    await this.logsRepository.create(log)
 
     return success(null)
   }

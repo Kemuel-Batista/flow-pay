@@ -4,9 +4,12 @@ import { TransactionType } from '@/domain/payment/enterprise/enums/transaction-t
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { InMemoryAccountsRepository } from 'test/repositories/in-memory-accounts-repository'
 import { makeAccount } from 'test/factories/make-account'
+import { InMemoryLogsRepository } from 'test/repositories/in-memory-logs-repository'
+import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
 
 let inMemoryAccountsRepository: InMemoryAccountsRepository
 let inMemoryTransactionsRepository: InMemoryTransactionsRepository
+let inMemoryLogsRepository: InMemoryLogsRepository
 
 let sut: CreateDefaultTransactionUseCase
 
@@ -16,10 +19,12 @@ describe('Create default transaction use case', () => {
     inMemoryAccountsRepository = new InMemoryAccountsRepository(
       inMemoryTransactionsRepository,
     )
+    inMemoryLogsRepository = new InMemoryLogsRepository()
 
     sut = new CreateDefaultTransactionUseCase(
       inMemoryAccountsRepository,
       inMemoryTransactionsRepository,
+      inMemoryLogsRepository,
     )
   })
 
@@ -37,6 +42,7 @@ describe('Create default transaction use case', () => {
     })
 
     expect(result.isSuccess()).toBe(true)
+
     expect(inMemoryTransactionsRepository.items).toHaveLength(1)
     expect(inMemoryTransactionsRepository.items).toEqual(
       expect.arrayContaining([
@@ -44,6 +50,18 @@ describe('Create default transaction use case', () => {
           type: TransactionType.ENTRY,
           userId: new UniqueEntityID('1'),
           value: 100,
+        }),
+      ]),
+    )
+
+    expect(inMemoryLogsRepository.items).toHaveLength(1)
+    expect(inMemoryLogsRepository.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          process: 'transaction.create',
+          level: LogLevel.TRACE,
+          userId: new UniqueEntityID('1'),
+          value: `transaction.value: 100`,
         }),
       ]),
     )

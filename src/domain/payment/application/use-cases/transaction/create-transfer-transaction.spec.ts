@@ -5,9 +5,12 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { makeAccount } from 'test/factories/make-account'
 import { makeTransaction } from 'test/factories/make-transaction'
 import { TransactionType } from '@/domain/payment/enterprise/enums/transaction-type'
+import { InMemoryLogsRepository } from 'test/repositories/in-memory-logs-repository'
+import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
 
 let inMemoryAccountsRepository: InMemoryAccountsRepository
 let inMemoryTransactionsRepository: InMemoryTransactionsRepository
+let inMemoryLogsRepository: InMemoryLogsRepository
 
 let sut: CreateTransferTransactionUseCase
 
@@ -17,10 +20,12 @@ describe('Create transfer transaction use case', () => {
     inMemoryAccountsRepository = new InMemoryAccountsRepository(
       inMemoryTransactionsRepository,
     )
+    inMemoryLogsRepository = new InMemoryLogsRepository()
 
     sut = new CreateTransferTransactionUseCase(
       inMemoryAccountsRepository,
       inMemoryTransactionsRepository,
+      inMemoryLogsRepository,
     )
   })
 
@@ -65,5 +70,19 @@ describe('Create transfer transaction use case', () => {
     const balanceOfTransferAccount =
       await inMemoryAccountsRepository.getBalance(account.id.toString())
     expect(balanceOfTransferAccount).toEqual(0)
+
+    expect(inMemoryLogsRepository.items).toHaveLength(1)
+    expect(inMemoryLogsRepository.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          process: 'transaction.transfer',
+          level: LogLevel.TRACE,
+          userId: new UniqueEntityID('1'),
+          value: `entry-transaction.value: 50 | entry-account: ${transferAccount.id}`,
+          oldValue: `exit-transaction.value: 50 | exit-account: ${account.id}`,
+          note: `account.bankNumber: 003 | account.agencyNumber: 0001 | account.accountNumber: 0943279847`,
+        }),
+      ]),
+    )
   })
 })
