@@ -33,6 +33,7 @@ describe('Get account balance use case', () => {
 
     const result = await sut.execute({
       id: '1',
+      userId: '1',
     })
 
     expect(result.isSuccess()).toBe(true)
@@ -70,6 +71,7 @@ describe('Get account balance use case', () => {
 
     const result = await sut.execute({
       id: '1',
+      userId: '1',
     })
 
     expect(result.isSuccess()).toBe(true)
