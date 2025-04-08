@@ -38,6 +38,7 @@ describe('Create user use case', () => {
       password: '123456',
       email: 'kemuellima20@gmail.com',
       phoneNumber: '41984545987',
+      createdBy: '1',
     })
 
     expect(result.isSuccess()).toBe(true)
@@ -79,6 +80,7 @@ describe('Create user use case', () => {
       password: '123456',
       email: 'kemuellima20@gmail.com',
       phoneNumber: '41984545987',
+      createdBy: '1',
     })
 
     expect(result.isError()).toBe(true)
@@ -99,6 +101,7 @@ describe('Create user use case', () => {
       password: '123456',
       email: 'kemuellima20@gmail.com',
       phoneNumber: '41984545987',
+      createdBy: '1',
     })
 
     expect(result.isSuccess()).toBe(true)

@@ -6,6 +6,8 @@ import { User } from '@/domain/payment/enterprise/entities/user'
 import { AccountsRepository } from '../../repositories/accounts-repository'
 import { Account } from '@/domain/payment/enterprise/entities/account'
 import { AccountStatus } from '@/domain/payment/enterprise/enums/account-status'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { Injectable } from '@nestjs/common'
 
 interface CreateUserUseCaseRequest {
   name: string
@@ -14,6 +16,7 @@ interface CreateUserUseCaseRequest {
   password: string
   email: string
   phoneNumber: string
+  createdBy: string
 }
 
 type CreateUserUseCaseResponse = Either<
@@ -23,6 +26,7 @@ type CreateUserUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class CreateUserUseCase {
   constructor(
     private usersRepository: UsersRepository,
@@ -37,6 +41,7 @@ export class CreateUserUseCase {
     password,
     email,
     phoneNumber,
+    createdBy,
   }: CreateUserUseCaseRequest): Promise<CreateUserUseCaseResponse> {
     const userWithSameUsername =
       await this.usersRepository.findByUsername(username)
@@ -58,6 +63,7 @@ export class CreateUserUseCase {
       password: hashedPassword,
       email,
       phoneNumber,
+      createdBy: new UniqueEntityID(createdBy),
     })
 
     await this.usersRepository.create(user)

@@ -33,5 +33,12 @@ import { PrismaLogRepository } from './prisma/repositories/prisma-log-repository
       useClass: PrismaLogRepository,
     },
   ],
+  exports: [
+    PrismaService,
+    UsersRepository,
+    AccountsRepository,
+    TransactionsRepository,
+    LogsRepository,
+  ],
 })
 export class DatabaseModule {}
