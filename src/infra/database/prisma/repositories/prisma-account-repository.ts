@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { Account } from '@/domain/payment/enterprise/entities/account'
 import { PrismaAccountMapper } from '../mappers/prisma-account-mapper'
+import { TransactionType } from '@/domain/payment/enterprise/enums/transaction-type'
 
 @Injectable()
 export class PrismaAccountRepository implements AccountsRepository {
@@ -57,25 +58,40 @@ export class PrismaAccountRepository implements AccountsRepository {
   }
 
   async getBalance(accountId: string): Promise<number> {
-    const [entries, exits] = await Promise.all([
-      this.prisma.transaction.aggregate({
-        _sum: { value: true },
-        where: {
-          destinationAccountId: accountId,
-        },
-      }),
-      this.prisma.transaction.aggregate({
-        _sum: { value: true },
-        where: {
-          originAccountId: accountId,
-        },
-      }),
-    ])
+    const transactions = await this.prisma.transaction.findMany({
+      where: {
+        OR: [
+          {
+            originAccountId: accountId,
+          },
+          {
+            destinationAccountId: accountId,
+          },
+        ],
+      },
+    })
 
-    const entrySum = entries._sum.value ?? 0
-    const exitSum = exits._sum.value ?? 0
+    let totalEntry = 0
+    let totalExit = 0
 
-    return entrySum - exitSum
+    for (const t of transactions) {
+      const isEntry =
+        (t.type === TransactionType.ENTRY &&
+          t.originAccountId.toString() === accountId) ||
+        (t.type === TransactionType.TRANSFER &&
+          t.destinationAccountId?.toString() === accountId)
+
+      const isExit =
+        (t.type === TransactionType.EXIT &&
+          t.originAccountId.toString() === accountId) ||
+        (t.type === TransactionType.TRANSFER &&
+          t.originAccountId.toString() === accountId)
+
+      if (isEntry) totalEntry += t.value
+      if (isExit) totalExit += t.value
+    }
+
+    return totalEntry - totalExit
   }
 
   async getLastAccountNumber(): Promise<string> {

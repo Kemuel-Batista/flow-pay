@@ -12,6 +12,7 @@ import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { TransactionStatus } from '@/domain/payment/enterprise/enums/transaction-status'
 import { Log } from '@/domain/payment/enterprise/entities/log'
 import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
+import { Injectable } from '@nestjs/common'
 
 interface CancelTransferTransactionUseCaseRequest {
   transactionId: string
@@ -26,6 +27,7 @@ type CancelTransferTransactionUseCaseResponse = Either<
   null
 >
 
+@Injectable()
 export class CancelTransferTransactionUseCase {
   constructor(
     private transactionsRepository: TransactionsRepository,

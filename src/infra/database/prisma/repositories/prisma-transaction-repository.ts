@@ -34,6 +34,25 @@ export class PrismaTransactionRepository implements TransactionsRepository {
     return transactions.map(PrismaTransactionMapper.toDomain)
   }
 
+  async findManyByAccountId(accountId: string): Promise<Transaction[]> {
+    const [transactions] = await this.prisma.$transaction([
+      this.prisma.transaction.findMany({
+        where: {
+          OR: [
+            {
+              originAccountId: accountId,
+            },
+            {
+              destinationAccountId: accountId,
+            },
+          ],
+        },
+      }),
+    ])
+
+    return transactions.map(PrismaTransactionMapper.toDomain)
+  }
+
   async save(transaction: Transaction): Promise<void> {
     const data = PrismaTransactionMapper.toPersistency(transaction)
 

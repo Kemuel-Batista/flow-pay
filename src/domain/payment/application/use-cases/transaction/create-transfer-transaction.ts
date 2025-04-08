@@ -9,6 +9,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Log } from '@/domain/payment/enterprise/entities/log'
 import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
 import { LogsRepository } from '../../repositories/logs-repository'
+import { Injectable } from '@nestjs/common'
 
 interface CreateTransferTransactionUseCaseRequest {
   bankNumber: string
@@ -20,10 +21,11 @@ interface CreateTransferTransactionUseCaseRequest {
 }
 
 type CreateTransferTransactionUseCaseResponse = Either<
-  ResourceNotFoundError,
+  ResourceNotFoundError | NotEnoughBalanceError,
   null
 >
 
+@Injectable()
 export class CreateTransferTransactionUseCase {
   constructor(
     private accountsRepository: AccountsRepository,

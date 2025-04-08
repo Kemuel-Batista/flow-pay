@@ -22,6 +22,17 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
     return transactions
   }
 
+  async findManyByAccountId(accountId: string): Promise<Transaction[]> {
+    const transactions = this.items.filter((transaction) => {
+      return (
+        transaction.originAccountId.toString() === accountId ||
+        transaction.destinationAccountId?.toString() === accountId
+      )
+    })
+
+    return transactions
+  }
+
   async save(transaction: Transaction): Promise<void> {
     const itemIndex = this.items.findIndex((item) => item.id === transaction.id)
 

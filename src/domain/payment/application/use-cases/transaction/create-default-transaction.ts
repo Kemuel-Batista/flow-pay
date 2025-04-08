@@ -1,5 +1,4 @@
 import { Either, failure, success } from '@/core/either'
-import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { NotEnoughBalanceError } from './errors/not-enough-balance-error'
 import { Transaction } from '@/domain/payment/enterprise/entities/transaction'
@@ -10,6 +9,7 @@ import { AccountsRepository } from '../../repositories/accounts-repository'
 import { LogsRepository } from '../../repositories/logs-repository'
 import { Log } from '@/domain/payment/enterprise/entities/log'
 import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
+import { Injectable } from '@nestjs/common'
 
 interface CreateDefaultTransactionUseCaseRequest {
   value: number
@@ -18,10 +18,11 @@ interface CreateDefaultTransactionUseCaseRequest {
 }
 
 type CreateDefaultTransactionUseCaseResponse = Either<
-  ResourceNotFoundError | NotAllowedError | NotEnoughBalanceError,
+  ResourceNotFoundError | NotEnoughBalanceError,
   null
 >
 
+@Injectable()
 export class CreateDefaultTransactionUseCase {
   constructor(
     private accountsRepository: AccountsRepository,
