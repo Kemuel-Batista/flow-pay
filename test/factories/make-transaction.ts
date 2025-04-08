@@ -15,7 +15,7 @@ export function makeTransaction(
     {
       type: TransactionType.ENTRY,
       value: faker.number.int(),
-      accountId: new UniqueEntityID(),
+      originAccountId: new UniqueEntityID(),
       userId: new UniqueEntityID(),
       ...override,
     },

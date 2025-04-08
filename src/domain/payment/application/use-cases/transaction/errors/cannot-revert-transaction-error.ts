@@ -1,10 +1,10 @@
 import { UseCaseError } from '@/core/errors/use-case-error'
 
-export class WalletDestinationInvalidError
+export class CannotRevertTransactionError
   extends Error
   implements UseCaseError
 {
   constructor() {
-    super('The destination wallet name is invalid.')
+    super('You cannot revert this operation.')
   }
 }

@@ -7,6 +7,7 @@ import { makeTransaction } from 'test/factories/make-transaction'
 import { TransactionType } from '@/domain/payment/enterprise/enums/transaction-type'
 import { InMemoryLogsRepository } from 'test/repositories/in-memory-logs-repository'
 import { LogLevel } from '@/domain/payment/enterprise/enums/log-level'
+import { NotEnoughBalanceError } from './errors/not-enough-balance-error'
 
 let inMemoryAccountsRepository: InMemoryAccountsRepository
 let inMemoryTransactionsRepository: InMemoryTransactionsRepository
@@ -44,7 +45,7 @@ describe('Create transfer transaction use case', () => {
 
     inMemoryTransactionsRepository.items.push(
       makeTransaction({
-        accountId: account.id,
+        originAccountId: account.id,
         type: TransactionType.ENTRY,
         userId: account.userId,
         value: 50,
@@ -60,7 +61,7 @@ describe('Create transfer transaction use case', () => {
     })
 
     expect(result.isSuccess()).toBe(true)
-    expect(inMemoryTransactionsRepository.items).toHaveLength(3)
+    expect(inMemoryTransactionsRepository.items).toHaveLength(2)
 
     const balanceOfAccount = await inMemoryAccountsRepository.getBalance(
       account.id.toString(),
@@ -68,8 +69,8 @@ describe('Create transfer transaction use case', () => {
     expect(balanceOfAccount).toEqual(0)
 
     const balanceOfTransferAccount =
-      await inMemoryAccountsRepository.getBalance(account.id.toString())
-    expect(balanceOfTransferAccount).toEqual(0)
+      await inMemoryAccountsRepository.getBalance(transferAccount.id.toString())
+    expect(balanceOfTransferAccount).toEqual(50)
 
     expect(inMemoryLogsRepository.items).toHaveLength(1)
     expect(inMemoryLogsRepository.items).toEqual(
@@ -79,10 +80,35 @@ describe('Create transfer transaction use case', () => {
           level: LogLevel.TRACE,
           userId: new UniqueEntityID('1'),
           value: `entry-transaction.value: 50 | entry-account: ${transferAccount.id}`,
-          oldValue: `exit-transaction.value: 50 | exit-account: ${account.id}`,
+          oldValue: `transfer-transaction.value: 50 | transfer-account: ${account.id}`,
           note: `account.bankNumber: 003 | account.agencyNumber: 0001 | account.accountNumber: 0943279847`,
         }),
       ]),
     )
+  })
+
+  it('should not be able to create a transfer transaction if not have balance in account', async () => {
+    const account = makeAccount({
+      userId: new UniqueEntityID('1'),
+    })
+
+    const transferAccount = makeAccount({
+      bankNumber: '003',
+      agencyNumber: '0001',
+      accountNumber: '0943279847',
+    })
+
+    inMemoryAccountsRepository.items.push(account, transferAccount)
+
+    const result = await sut.execute({
+      bankNumber: '003',
+      agencyNumber: '0001',
+      accountNumber: '0943279847',
+      value: 50,
+      userId: '1',
+    })
+
+    expect(result.isError()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotEnoughBalanceError)
   })
 })

@@ -8,7 +8,8 @@ export interface TransactionProps {
   description?: string
   type: number
   status: number
-  accountId: UniqueEntityID
+  originAccountId: UniqueEntityID
+  destinationAccountId?: UniqueEntityID
   userId: UniqueEntityID
   createdAt: Date
   updatedAt?: Date | null
@@ -33,24 +34,6 @@ export class Transaction extends Entity<TransactionProps> {
     this.touch()
   }
 
-  get accountId() {
-    return this.props.accountId
-  }
-
-  set accountId(accountId: UniqueEntityID) {
-    this.props.accountId = accountId
-    this.touch()
-  }
-
-  get userId() {
-    return this.props.userId
-  }
-
-  set userId(userId: UniqueEntityID) {
-    this.props.userId = userId
-    this.touch()
-  }
-
   get type() {
     return this.props.type
   }
@@ -66,6 +49,33 @@ export class Transaction extends Entity<TransactionProps> {
 
   set status(status: number) {
     this.props.status = status
+    this.touch()
+  }
+
+  get originAccountId() {
+    return this.props.originAccountId
+  }
+
+  set originAccountId(originAccountId: UniqueEntityID) {
+    this.props.originAccountId = originAccountId
+    this.touch()
+  }
+
+  get destinationAccountId() {
+    return this.props.destinationAccountId
+  }
+
+  set destinationAccountId(destinationAccountId: UniqueEntityID | undefined) {
+    this.props.destinationAccountId = destinationAccountId
+    this.touch()
+  }
+
+  get userId() {
+    return this.props.userId
+  }
+
+  set userId(userId: UniqueEntityID) {
+    this.props.userId = userId
     this.touch()
   }
 

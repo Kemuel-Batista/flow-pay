@@ -1,6 +1,7 @@
 import { Account } from '../../enterprise/entities/account'
 
 export abstract class AccountsRepository {
+  abstract findById(id: string): Promise<Account | null>
   abstract findByUserId(userId: string): Promise<Account | null>
   abstract findByAccountInformation(
     bankNumber: string,

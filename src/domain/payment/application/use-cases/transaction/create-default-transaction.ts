@@ -49,7 +49,7 @@ export class CreateDefaultTransactionUseCase {
     const transaction = Transaction.create({
       type,
       value,
-      accountId: account.id,
+      originAccountId: account.id,
       userId: new UniqueEntityID(userId),
     })
 

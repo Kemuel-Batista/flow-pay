@@ -8,6 +8,16 @@ export class InMemoryAccountsRepository implements AccountsRepository {
 
   constructor(private transactionsRepository: InMemoryTransactionsRepository) {}
 
+  async findById(id: string): Promise<Account | null> {
+    const account = this.items.find((item) => item.id.toString() === id)
+
+    if (!account) {
+      return null
+    }
+
+    return account
+  }
+
   async findByUserId(userId: string): Promise<Account | null> {
     const account = this.items.find((item) => item.userId.toString() === userId)
 
@@ -39,19 +49,33 @@ export class InMemoryAccountsRepository implements AccountsRepository {
 
   async getBalance(id: string): Promise<number> {
     const transactions = this.transactionsRepository.items.filter(
-      (transaction) => transaction.accountId.toString() === id,
+      (transaction) => {
+        return (
+          transaction.originAccountId.toString() === id ||
+          transaction.destinationAccountId?.toString() === id
+        )
+      },
     )
 
-    const entryTransactions = transactions.filter(
-      (item) => item.type === TransactionType.ENTRY,
-    )
+    let totalEntry = 0
+    let totalExit = 0
 
-    const exitTransactions = transactions.filter(
-      (item) => item.type === TransactionType.EXIT,
-    )
+    for (const t of transactions) {
+      const isEntry =
+        (t.type === TransactionType.ENTRY &&
+          t.originAccountId.toString() === id) ||
+        (t.type === TransactionType.TRANSFER &&
+          t.destinationAccountId?.toString() === id)
 
-    const totalEntry = entryTransactions.reduce((sum, t) => sum + t.value, 0)
-    const totalExit = exitTransactions.reduce((sum, t) => sum + t.value, 0)
+      const isExit =
+        (t.type === TransactionType.EXIT &&
+          t.originAccountId.toString() === id) ||
+        (t.type === TransactionType.TRANSFER &&
+          t.originAccountId.toString() === id)
+
+      if (isEntry) totalEntry += t.value
+      if (isExit) totalExit += t.value
+    }
 
     return totalEntry - totalExit
   }

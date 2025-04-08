@@ -64,33 +64,23 @@ export class CreateTransferTransactionUseCase {
       return failure(new NotEnoughBalanceError())
     }
 
-    const exitTransaction = Transaction.create({
-      type: TransactionType.EXIT,
+    const transferTransaction = Transaction.create({
+      type: TransactionType.TRANSFER,
       value,
       userId: new UniqueEntityID(userId),
-      accountId: account.id,
+      originAccountId: account.id,
+      destinationAccountId: transferAccount.id,
       description,
     })
 
-    const entryTransaction = Transaction.create({
-      type: TransactionType.ENTRY,
-      value,
-      userId: new UniqueEntityID(userId),
-      accountId: transferAccount.id,
-      description,
-    })
-
-    await Promise.all([
-      this.transactionsRepository.create(exitTransaction),
-      this.transactionsRepository.create(entryTransaction),
-    ])
+    await this.transactionsRepository.create(transferTransaction)
 
     const log = Log.create({
       process: 'transaction.transfer',
       level: LogLevel.TRACE,
       userId: new UniqueEntityID(userId),
-      value: `entry-transaction.value: ${entryTransaction.value} | entry-account: ${transferAccount.id}`,
-      oldValue: `exit-transaction.value: ${exitTransaction.value} | exit-account: ${account.id}`,
+      value: `entry-transaction.value: ${transferTransaction.value} | entry-account: ${transferAccount.id}`,
+      oldValue: `transfer-transaction.value: ${transferTransaction.value} | transfer-account: ${account.id}`,
       note: `account.bankNumber: ${bankNumber} | account.agencyNumber: ${agencyNumber} | account.accountNumber: ${accountNumber}`,
     })
 

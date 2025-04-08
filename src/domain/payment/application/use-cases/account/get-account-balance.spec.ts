@@ -54,7 +54,7 @@ describe('Get account balance use case', () => {
       makeTransaction({
         type: TransactionType.ENTRY,
         value: 200,
-        accountId: account.id,
+        originAccountId: account.id,
         userId: new UniqueEntityID('1'),
       }),
     )
@@ -63,7 +63,7 @@ describe('Get account balance use case', () => {
       makeTransaction({
         type: TransactionType.EXIT,
         value: 100,
-        accountId: account.id,
+        originAccountId: account.id,
         userId: new UniqueEntityID('1'),
       }),
     )
