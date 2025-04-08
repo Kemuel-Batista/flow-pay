@@ -16,6 +16,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 import { CreateTransferTransactionUseCase } from '@/domain/payment/application/use-cases/transaction/create-transfer-transaction'
 import { NotEnoughBalanceError } from '@/domain/payment/application/use-cases/transaction/errors/not-enough-balance-error'
+import { logger } from '@/infra/config/winston-config'
 
 const createTransferTransactionBodySchema = z.object({
   bankNumber: z.string(),
@@ -58,6 +59,7 @@ export class CreateTransferTransactionController {
 
     if (result.isError()) {
       const error = result.value
+      logger.error(`Create Transfer Transaction Error - ${error.message}`)
 
       switch (error.constructor) {
         case NotEnoughBalanceError:

@@ -15,6 +15,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 import { CreateUserUseCase } from '@/domain/payment/application/use-cases/user/create-user'
 import { ResourceAlreadyExistsError } from '@/core/errors/errors/resource-already-exists-error'
+import { logger } from '@/infra/config/winston-config'
 
 const createUserBodySchema = z.object({
   name: z.string(),
@@ -53,6 +54,7 @@ export class CreateUserController {
 
     if (result.isError()) {
       const error = result.value
+      logger.error(`Create User Error - ${error.message}`)
 
       switch (error.constructor) {
         case ResourceAlreadyExistsError:

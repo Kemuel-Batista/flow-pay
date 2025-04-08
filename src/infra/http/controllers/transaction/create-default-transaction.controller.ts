@@ -16,6 +16,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 import { CreateDefaultTransactionUseCase } from '@/domain/payment/application/use-cases/transaction/create-default-transaction'
 import { NotEnoughBalanceError } from '@/domain/payment/application/use-cases/transaction/errors/not-enough-balance-error'
+import { logger } from '@/infra/config/winston-config'
 
 const createDefaultTransactionBodySchema = z.object({
   value: z.number().int(),
@@ -52,6 +53,7 @@ export class CreateDefaultTransactionController {
 
     if (result.isError()) {
       const error = result.value
+      logger.error(`Create Default Transaction Error - ${error.message}`)
 
       switch (error.constructor) {
         case NotEnoughBalanceError:
