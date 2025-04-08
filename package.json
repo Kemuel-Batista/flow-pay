@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -12,14 +18,29 @@
   "description": "Test for Grupo Adriano Corbuccio",
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",
+    "@nestjs/cli": "^11.0.6",
+    "@nestjs/schematics": "^11.0.4",
     "@rocketseat/eslint-config": "^2.2.2",
+    "@swc/cli": "^0.6.0",
     "@swc/core": "^1.11.18",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.14.0",
+    "@types/supertest": "^6.0.3",
     "eslint": "^8.57.0",
     "eslint-plugin-vitest-globals": "^1.5.0",
+    "supertest": "^7.1.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "unplugin-swc": "^1.5.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.13",
+    "@nestjs/core": "^11.0.13",
+    "@nestjs/platform-express": "^11.0.13",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   }
 }
