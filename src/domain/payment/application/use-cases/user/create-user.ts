@@ -3,6 +3,9 @@ import { HashGenerator } from '../../cryptography/hash-generator'
 import { UsersRepository } from '../../repositories/users-repository'
 import { ResourceAlreadyExistsError } from '@/core/errors/errors/resource-already-exists-error'
 import { User } from '@/domain/payment/enterprise/entities/user'
+import { AccountsRepository } from '../../repositories/accounts-repository'
+import { Account } from '@/domain/payment/enterprise/entities/account'
+import { AccountStatus } from '@/domain/payment/enterprise/enums/account-status'
 
 interface CreateUserUseCaseRequest {
   name: string
@@ -24,6 +27,7 @@ export class CreateUserUseCase {
   constructor(
     private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
+    private accountsRepository: AccountsRepository,
   ) {}
 
   async execute({
@@ -57,6 +61,23 @@ export class CreateUserUseCase {
     })
 
     await this.usersRepository.create(user)
+
+    const lastAccountNumber =
+      await this.accountsRepository.getLastAccountNumber()
+    const nextAccountNumber = String(Number(lastAccountNumber) + 1).padStart(
+      6,
+      '0',
+    )
+    const account = Account.create({
+      bankNumber: '003',
+      agencyNumber: '0001',
+      accountNumber: nextAccountNumber,
+      status: AccountStatus.ACTIVE,
+      userId: user.id,
+      createdBy: user.id,
+    })
+
+    await this.accountsRepository.create(account)
 
     return success({
       user,

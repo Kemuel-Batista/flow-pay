@@ -80,6 +80,20 @@ export class InMemoryAccountsRepository implements AccountsRepository {
     return totalEntry - totalExit
   }
 
+  async getLastAccountNumber(): Promise<string> {
+    if (this.items.length === 0) {
+      return '000000'
+    }
+
+    const lastAccount = this.items.reduce((prev, current) => {
+      return Number(current.accountNumber) > Number(prev.accountNumber)
+        ? current
+        : prev
+    })
+
+    return lastAccount.accountNumber
+  }
+
   async listByUserId(userId: string): Promise<Account[]> {
     const accounts = this.items.filter(
       (item) => item.userId.toString() === userId,

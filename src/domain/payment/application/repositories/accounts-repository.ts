@@ -10,6 +10,7 @@ export abstract class AccountsRepository {
   ): Promise<Account | null>
 
   abstract getBalance(id: string): Promise<number>
+  abstract getLastAccountNumber(): Promise<string>
   abstract save(account: Account): Promise<void>
   abstract create(account: Account): Promise<void>
 }
