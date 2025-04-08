@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String @id @default(uuid())
+  name        String
+  lastname    String
+  username    String @unique
+  password    String
+  email       String
+  phoneNumber String @map("phone_number")
+
+  createdAt     DateTime  @default(now()) @map("cre ated_at")
+  createdBy     String?   @map("created_by")
+  createdByUser User?     @relation("UserCreatedBy", fields: [createdBy], references: [id])
+  updatedAt     DateTime? @map("updated_at")
+  updatedBy     String?   @map("updated_by")
+  updatedByUser User?     @relation("UserUpdatedBy", fields: [updatedBy], references: [id])
+
+  createdUsers User[] @relation("UserCreatedBy")
+  updatedUsers User[] @relation("UserUpdatedBy")
+
+  account         Account?  @relation("UserAccount")
+  createdAccounts Account[] @relation("AccountCreatedBy")
+  updatedAccounts Account[] @relation("AccountUpdatedBy")
+
+  transactions Transaction[]
+  logs         Log[]
+
+  @@map("users")
+}
+
+model Account {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  bankNumber    String    @map("bank_number")
+  agencyNumber  String    @map("agency_number")
+  accountNumber String    @map("account_number")
+  status        Int
+  createdAt     DateTime  @default(now()) @map("created_at")
+  createdBy     String    @map("created_by")
+  updatedAt     DateTime? @map("updated_at")
+  updatedBy     String?   @map("updated_by")
+
+  // Relacionamento com o dono da conta
+  user User @relation("UserAccount", fields: [userId], references: [id])
+
+  // Relacionamento com o criador/modificador
+  createdByUser User  @relation("AccountCreatedBy", fields: [createdBy], references: [id])
+  updatedByUser User? @relation("AccountUpdatedBy", fields: [updatedBy], references: [id])
+
+  originTransactions      Transaction[] @relation("OriginAccount")
+  destinationTransactions Transaction[] @relation("DestinationAccount")
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id                   String    @id @default(uuid())
+  value                Float
+  description          String?
+  type                 Int
+  status               Int
+  originAccountId      String    @map("origin_account_id")
+  destinationAccountId String?   @map("destination_account_id")
+  userId               String    @map("user_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime? @map("updated_at")
+
+  // Relacionamentos
+  originAccount      Account  @relation("OriginAccount", fields: [originAccountId], references: [id])
+  destinationAccount Account? @relation("DestinationAccount", fields: [destinationAccountId], references: [id])
+  user               User     @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  process   String
+  value     String
+  oldValue  String?  @map("old_value")
+  timestamp DateTime @default(now())
+  level     Int
+  note      String?
+  userId    String   @map("user_id")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("logs")
+}

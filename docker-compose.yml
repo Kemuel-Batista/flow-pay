@@ -1,0 +1,10 @@
+services: 
+  postgres: 
+    container_name: flow-pay-pg
+    image: bitnami/postgresql
+    ports:
+      - 5432:5432 
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=flowpay

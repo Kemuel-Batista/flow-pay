@@ -14,6 +14,14 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
     return transaction
   }
 
+  async findManyByUserId(userId: string): Promise<Transaction[]> {
+    const transactions = this.items.filter(
+      (item) => item.userId.toString() === userId,
+    )
+
+    return transactions
+  }
+
   async save(transaction: Transaction): Promise<void> {
     const itemIndex = this.items.findIndex((item) => item.id === transaction.id)
 
@@ -22,13 +30,5 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
 
   async create(transaction: Transaction): Promise<void> {
     this.items.push(transaction)
-  }
-
-  async listByUserId(userId: string): Promise<Transaction[]> {
-    const transactions = this.items.filter(
-      (item) => item.userId.toString() === userId,
-    )
-
-    return transactions
   }
 }

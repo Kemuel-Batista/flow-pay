@@ -28,6 +28,7 @@
     "@types/supertest": "^6.0.3",
     "eslint": "^8.57.0",
     "eslint-plugin-vitest-globals": "^1.5.0",
+    "prisma": "^6.5.0",
     "supertest": "^7.1.0",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
@@ -40,6 +41,7 @@
     "@nestjs/common": "^11.0.13",
     "@nestjs/core": "^11.0.13",
     "@nestjs/platform-express": "^11.0.13",
+    "@prisma/client": "^6.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   }
