@@ -4,7 +4,7 @@
 
 Diagrama de Classe
 
-![Flow Pay - Class Diagram](./.github/images/class-diagram.png)
+![flow-pay](https://github.com/user-attachments/assets/c60f83de-3b2d-43ab-a9e8-551816c69394)
 
 Requisitos Funcionais
 
